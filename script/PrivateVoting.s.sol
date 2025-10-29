@@ -2,17 +2,17 @@
 pragma solidity ^0.8.13;
 
 import {Script} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import {PrivateVoting} from "../src/PrivateVoting.sol";
 
-contract CounterScript is Script {
-    Counter public counter;
+contract PrivateVotingScript is Script {
+    PrivateVoting public privateVoting;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new Counter();
+        privateVoting = new PrivateVoting();
 
         vm.stopBroadcast();
     }
