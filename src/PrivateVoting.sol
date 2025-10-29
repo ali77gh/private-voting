@@ -4,9 +4,16 @@ pragma solidity ^0.8.13;
 import {IPrivateVoting} from "./IPrivateVoting.sol";
 
 contract PrivateVoting is IPrivateVoting {
-    function signup(uint256 commitment) external {}
+    bool public isSignupActive = true;
 
-    function finalize() external {}
+    function signup(uint256 commitment) external {
+        require(isSignupActive, "signup is not active anymore");
+        // TODO
+    }
+
+    function finalize() external {
+        isSignupActive = false;
+    }
 
     function vote(
         uint256[2] memory _pA,
@@ -14,5 +21,7 @@ contract PrivateVoting is IPrivateVoting {
         uint256[2] memory _pC,
         string memory voteValue,
         uint256 nullifier
-    ) external {}
+    ) external {
+        // TODO
+    }
 }
