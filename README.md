@@ -1,66 +1,30 @@
-## Foundry
+## Private Voting
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Merkle tree
+2^n
 
-Foundry consists of:
+               / \
+              /   \
+             /\   /\
+            /\/\ /\/\
+           C C C 0 00 0 0    
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## keywords to study
+1. Sparse Merkle Tree
+1. Nullifier
+1. MiMC7 in Solidity (Find yourself)
+1. MiMC7 in Circom (https://github.com/tornadocash/tornado-core/blob/1ef6a263ac6a0e476d063fcb269a9df65a1bd56a/circuits/merkleTree.circom#L3)
+1. Difference between signal output and public inputs in Circom
 
-## Documentation
+## Goal
+Build a MiMC7 Sparse-Merkle-Tree in Solidity. MiMC7 is a 2-input Snark friendly hash function
 
-https://book.getfoundry.sh/
+Create a Solidity contract for voting.
 
-## Usage
+signup(uint256 commitment) for users to add their commitment to the tree. A commitment is MiMC7(secret, 1)
 
-### Build
+finalize() to disallow adding more commitments to the tree
 
-```shell
-$ forge build
-```
+After tree is finalized, users can start voting.
 
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+vote(uint256[2] _pA, uint256[2][2] _pB, uint256[2] _pC, string vote, uint256 nullifier) where nullifier is MiMC7(secret, 2). The contract avoids using a nullifier more than once. The zero-knowledge proof circuit should get [tree_root, nullifier] as public inputs. The circuit checks if a user knows a secret which its MiMC7(secret, 1) exists in the tree and its MiMC7(secret, 2) is equal with the given public input.
