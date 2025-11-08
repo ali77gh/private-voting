@@ -10,9 +10,7 @@ contract PrivateVotingTest is Test {
     address public poseidonAddress;
 
     function setUp() public {
-        string memory poseidonHex = vm.readFile(
-            "bytecodes/poseidon_runtime.hex"
-        );
+        string memory poseidonHex = vm.readFile("bytecodes/poseidon.hex");
         bytes memory poseidonBytes = vm.parseBytes(poseidonHex);
         poseidonAddress = address(0x1234);
 
