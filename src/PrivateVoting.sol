@@ -2,17 +2,19 @@
 pragma solidity ^0.8.13;
 
 import {IPrivateVoting} from "./IPrivateVoting.sol";
-
-// Questions:
-//      merkle tree can be a mapping because it's mostly 0 and we just save ones
+import {IPoseidon} from "./IPoseidon.sol";
 
 contract PrivateVoting is IPrivateVoting {
     bool public isSignupActive = true;
-
-    // TODO an sparse merkle tree
+    IPoseidon public poseidon;
 
     string[] public votes;
     mapping(uint256 => bool) alreadyVotedNullifiers;
+
+    constructor(IPoseidon _poseidon) {
+        poseidon = _poseidon;
+        initDefaults();
+    }
 
     function signup(uint256 commitment) external {
         require(isSignupActive, "signup is not active anymore");
@@ -39,5 +41,10 @@ contract PrivateVoting is IPrivateVoting {
 
         alreadyVotedNullifiers[nullifier] = true;
         votes.push(voteValue);
+    }
+
+    // high level function for easier use
+    function hash(uint256 left, uint256 right) private view returns (uint256) {
+        return poseidon.poseidon([left, right]);
     }
 }
