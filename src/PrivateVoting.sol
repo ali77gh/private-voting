@@ -43,6 +43,25 @@ contract PrivateVoting is IPrivateVoting {
         votes.push(voteValue);
     }
 
+    uint256 public constant MAX_DEPTH = 32;
+
+    // ---- Defaults ----
+    // what is default:
+    // layer 0: 0
+    // layer 1: poseidon(0,0)
+    // layer 2: poseidon(poseidon(0,0),poseidon(0,0))
+
+    // index is layer
+    uint256[MAX_DEPTH] defaults;
+
+    // [0..MAX_DEPTH]
+    function initDefaults() public returns (uint256) {
+        defaults[0] = 0;
+        for (uint256 i = 1; i < MAX_DEPTH; i++) {
+            defaults[i] = hash(defaults[i - 1], defaults[i - 1]);
+        }
+    }
+
     // high level function for easier use
     function hash(uint256 left, uint256 right) private view returns (uint256) {
         return poseidon.poseidon([left, right]);
