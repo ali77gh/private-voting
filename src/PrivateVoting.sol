@@ -43,7 +43,32 @@ contract PrivateVoting is IPrivateVoting {
         votes.push(voteValue);
     }
 
+    // ---- Merkle Tree ----
+    //       layer              index      value
+    mapping(uint256 => mapping(uint256 => uint256)) public merkleTree;
+    uint256 public currentDepth = 0;
     uint256 public constant MAX_DEPTH = 32;
+
+    function getOrDefault(
+        uint256 layer,
+        uint256 index
+    ) public returns (uint256) {
+        uint256 node = merkleTree[layer][index];
+        if (node == 0) {
+            return defaults[layer];
+        } else {
+            return node;
+        }
+    }
+
+    function getRootOfTree() public returns (uint256) {
+        return merkleTree[currentDepth][0];
+    }
+
+    // pass hashed value
+    function insertToTree() private {
+        // TODO this is the hard part
+    }
 
     // ---- Defaults ----
     // what is default:
