@@ -11,6 +11,8 @@ contract PrivateVoting is IPrivateVoting {
     string[] public votes;
     mapping(uint256 => bool) alreadyVotedNullifiers;
 
+    event Signup(uint256 commitment);
+
     constructor(IPoseidon _poseidon) {
         poseidon = _poseidon;
         initDefaults();
@@ -19,6 +21,7 @@ contract PrivateVoting is IPrivateVoting {
     function signup(uint256 commitment) external {
         require(isSignupActive, "signup is not active anymore");
         insertToTree(commitment);
+        emit Signup(commitment);
     }
 
     function finalize() external {
