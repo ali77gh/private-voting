@@ -32,7 +32,7 @@ contract PrivateVotingTest is Test {
 
         // layer 2 (last layer)
         assertEq(privateVoting.getOrDefault(2, 0), 1111); // this is actually root
-        assertEq(privateVoting.getOrDefault(1, 1), 0); // out of range
+        assertEq(privateVoting.getOrDefault(2, 1), 0); // out of range
 
         assertEq(privateVoting.getRootOfTree(), 1111);
     }
@@ -64,8 +64,8 @@ contract PrivateVotingTest is Test {
         assertEq(privateVoting.getOrDefault(2, 2), 0); // out of range
 
         // layer 3 (last layer)
-        assertEq(privateVoting.getOrDefault(2, 0), 11111);
-        assertEq(privateVoting.getOrDefault(2, 1), 0); // out of range
+        assertEq(privateVoting.getOrDefault(3, 0), 11111);
+        assertEq(privateVoting.getOrDefault(3, 1), 0); // out of range
 
         assertEq(privateVoting.getRootOfTree(), 11111);
     }
