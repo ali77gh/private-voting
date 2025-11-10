@@ -9,34 +9,31 @@ import {console} from "forge-std/console.sol";
 contract PrivateVotingScript is Script {
     function run() public {
         // --- Step 1 upload Poseidon (hex)
-        uint256 deployerPrivateKey = vm.envUint("PK");
-
         bytes memory bytecode = vm.parseBytes(
             vm.readFile("./bytecodes/copy_poseidon.hex")
         );
 
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
 
-        address deployed;
+        address poseidonAddr;
         assembly {
-            deployed := create(0, add(bytecode, 0x20), mload(bytecode))
+            poseidonAddr := create(0, add(bytecode, 0x20), mload(bytecode))
         }
 
         vm.stopBroadcast();
 
-        require(deployed != address(0), "Deployment failed");
-        console.log("Poseidon Contract deployed at:", deployed);
+        require(poseidonAddr != address(0), "Deployment failed");
+        console.log("Poseidon Contract deployed at:", poseidonAddr);
 
-        IPoseidon poseidon = IPoseidon(deployed);
+        IPoseidon poseidon = IPoseidon(poseidonAddr);
 
         // --- Step 2 upload PrivateVoting (.sol)
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
 
         PrivateVoting privateVoting = new PrivateVoting(poseidon);
-        console.log(
-            "PrivateVoting Contract deployed at:",
-            address(privateVoting)
-        );
         vm.stopBroadcast();
+        address privateVotingAddr = address(privateVoting);
+        require(privateVotingAddr != address(0), "Deployment failed");
+        console.log("PrivateVoting Contract deployed at:", privateVotingAddr);
     }
 }
