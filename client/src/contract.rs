@@ -1,6 +1,6 @@
 //! Demonstrates reading a contract by fetching the WETH balance of an address.
 use alloy::{
-    primitives::Address,
+    primitives::{Address, U256},
     providers::{ProviderBuilder, RootProvider, fillers::*},
     sol,
 };
@@ -24,6 +24,11 @@ impl PrivateVotingContract {
         let contract = PrivateVoting::new(contract_address, provider);
 
         Ok(Self(contract))
+    }
+
+    pub async fn get_commitments(&self) -> Result<Vec<U256>, Box<dyn Error>> {
+        let c = self.0.Signup_filter().query().await?;
+        Ok(c.iter().map(|x| x.0.commitment).collect())
     }
 }
 
