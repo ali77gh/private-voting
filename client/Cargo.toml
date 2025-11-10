@@ -1,0 +1,8 @@
+[package]
+name = "private-voting-client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+alloy = "1.1.0"
+structopt = "0.3.26"

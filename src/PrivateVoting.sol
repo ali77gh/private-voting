@@ -68,7 +68,6 @@ contract PrivateVoting is IPrivateVoting {
         return merkleTree[currentDepth][0];
     }
 
-    // pass hashed value
     function insertToTree(uint256 commitment) private {
         // inserting commitment to layer 0 (no hash needed commitment is already a hashed value)
         merkleTree[0][layer0Length] = commitment;
