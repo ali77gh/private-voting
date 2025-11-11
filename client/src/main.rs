@@ -1,6 +1,7 @@
 use alloy::primitives::{U256, address};
 
 mod contract;
+mod hash;
 
 #[tokio::main]
 async fn main() {
