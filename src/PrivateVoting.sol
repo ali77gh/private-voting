@@ -48,7 +48,7 @@ contract PrivateVoting is IPrivateVoting {
     // ---- Merkle Tree ----
     //       layer              index      value
     mapping(uint256 => mapping(uint256 => uint256)) public merkleTree;
-    uint256 public currentDepth = 0;
+    // uint256 public currentDepth = 0;
     uint256 public layer0Length = 0;
     uint256 public constant MAX_DEPTH = 32;
 
@@ -64,8 +64,16 @@ contract PrivateVoting is IPrivateVoting {
         }
     }
 
+    function getCurrentDepth() public view returns (uint256) {
+        for (uint256 i = 0; i <= MAX_DEPTH; i++) {
+            if (merkleTree[i][0] == 0) {
+                return i - 1;
+            }
+        }
+    }
+
     function getRootOfTree() public view returns (uint256) {
-        return merkleTree[currentDepth][0];
+        return merkleTree[getCurrentDepth()][0];
     }
 
     function insertToTree(uint256 commitment) private {
@@ -75,9 +83,9 @@ contract PrivateVoting is IPrivateVoting {
 
         // initial value is index of inserted item
         uint256 pointer = layer0Length - 1;
-        bool isLeft = pointer % 2 == 0;
-        for (uint256 i = 0; i <= currentDepth; i++) {
-            isLeft = pointer % 2 == 0;
+
+        for (uint256 i = 0; pointer > 0; i++) {
+            bool isLeft = pointer % 2 == 0;
             if (isLeft) {
                 uint256 left = merkleTree[i][pointer];
                 uint256 right = defaults[i];
@@ -88,10 +96,6 @@ contract PrivateVoting is IPrivateVoting {
                 merkleTree[i + 1][pointer / 2] = hash(left, right);
             }
             pointer /= 2;
-        }
-
-        if (isLeft) {
-            currentDepth += 1;
         }
     }
 
@@ -110,6 +114,10 @@ contract PrivateVoting is IPrivateVoting {
         for (uint256 i = 1; i < MAX_DEPTH; i++) {
             defaults[i] = hash(defaults[i - 1], defaults[i - 1]);
         }
+    }
+
+    function getDefault(uint256 layer) public view returns (uint256) {
+        return defaults[layer];
     }
 
     // high level function for easier use
