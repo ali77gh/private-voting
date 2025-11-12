@@ -105,8 +105,8 @@ mod tests {
 
         // manual calculation
         //      root
-        //  right   left
-        // 76  77  78   0
+        //  left    right
+        // 76  77  78    0
         let left = hasher.hash(U256::from(76), U256::from(77)).unwrap();
         let right = hasher.hash(U256::from(78), U256::ZERO).unwrap();
         let correct_root = hasher.hash(left, right).unwrap();

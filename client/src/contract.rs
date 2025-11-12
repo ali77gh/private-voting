@@ -54,6 +54,10 @@ impl PrivateVotingContract {
             .await?;
         Ok(())
     }
+
+    pub async fn get_root(&self) -> Result<U256, Box<dyn Error>> {
+        Ok(self.0.getRootOfTree().call().await?)
+    }
 }
 
 // Generate the contract bindings for the ERC20 interface.
@@ -63,6 +67,7 @@ sol! {
    contract PrivateVoting {
         event Signup(uint256 commitment);
         function signup(uint256 commitment);
+        function getRootOfTree() public view returns (uint256);
    }
 }
 

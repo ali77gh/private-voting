@@ -29,8 +29,8 @@ mod tests {
     #[test]
     fn poseidon_test() {
         let mut hasher = Hasher::new().unwrap();
-        let a = U256::from_str_radix("5", 10).unwrap();
-        let b = U256::from_str_radix("77", 10).unwrap();
+        let a = U256::from(5);
+        let b = U256::from(77);
         let answer = U256::from_str_radix(
             "6008246173323011098915936938805752727781568490715388424063708882447636047656",
             10,
