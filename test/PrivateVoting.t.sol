@@ -90,6 +90,56 @@ contract PrivateVotingTest is Test {
         assertEq(privateVoting.getDefault(2), layer2);
         assertEq(privateVoting.getDefault(3), layer3);
     }
+
+    function test_merkleTreeEven() public {
+        privateVoting.signup(76);
+        privateVoting.signup(77);
+        privateVoting.signup(78);
+        privateVoting.signup(79);
+
+        // layer 0
+        assertEq(privateVoting.getOrDefault(0, 0), 76);
+        assertEq(privateVoting.getOrDefault(0, 1), 77);
+        assertEq(privateVoting.getOrDefault(0, 2), 78);
+        assertEq(privateVoting.getOrDefault(0, 3), 79);
+
+        // layer 1
+        uint256 left = poseidon.poseidon([uint256(76), uint256(77)]);
+        uint256 right = poseidon.poseidon([uint256(78), uint256(79)]);
+
+        assertEq(privateVoting.getOrDefault(1, 0), left);
+        assertEq(privateVoting.getOrDefault(1, 1), right);
+
+        // layer 2 (root)
+        uint256 root = poseidon.poseidon([left, right]);
+        assertEq(privateVoting.getOrDefault(2, 0), root);
+        assertEq(privateVoting.getCurrentDepth(), 2);
+        assertEq(privateVoting.getRootOfTree(), root);
+    }
+
+    function test_merkleTreeOdd() public {
+        privateVoting.signup(76);
+        privateVoting.signup(77);
+        privateVoting.signup(78);
+
+        // layer 0
+        assertEq(privateVoting.getOrDefault(0, 0), 76);
+        assertEq(privateVoting.getOrDefault(0, 1), 77);
+        assertEq(privateVoting.getOrDefault(0, 2), 78);
+
+        // layer 1
+        uint256 left = poseidon.poseidon([uint256(76), uint256(77)]);
+        uint256 right = poseidon.poseidon([uint256(78), uint256(0)]);
+
+        assertEq(privateVoting.getOrDefault(1, 0), left);
+        assertEq(privateVoting.getOrDefault(1, 1), right);
+
+        // layer 2 (root)
+        uint256 root = poseidon.poseidon([left, right]);
+        assertEq(privateVoting.getOrDefault(2, 0), root);
+        assertEq(privateVoting.getCurrentDepth(), 2);
+        assertEq(privateVoting.getRootOfTree(), root);
+    }
 }
 
 contract FakeHash is IPoseidon {
