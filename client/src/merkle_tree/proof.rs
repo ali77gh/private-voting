@@ -15,10 +15,6 @@ impl MerkleProof {
         });
     }
 
-    pub fn root(&self) -> U256 {
-        self.0.last().unwrap().value
-    }
-
     pub fn value(&self) -> U256 {
         self.0.first().unwrap().value
     }
