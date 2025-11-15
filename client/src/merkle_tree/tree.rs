@@ -126,4 +126,39 @@ mod tests {
 
         assert_eq!(merkle.root(), correct_root);
     }
+    #[test]
+    fn proof_test() {
+        let mut merkle = MerkleTree::new().unwrap();
+        let mut hasher = Hasher::new().unwrap();
+
+        merkle.add_leaf(U256::from(76));
+        merkle.add_leaf(U256::from(77));
+        merkle.add_leaf(U256::from(78));
+
+        merkle.calculate().unwrap();
+
+        // manual calculation
+        //      root
+        //  left    right
+        // 76  77  78    0
+        let left = hasher.hash(U256::from(76), U256::from(77)).unwrap();
+        let right = hasher.hash(U256::from(78), U256::ZERO).unwrap();
+        let root = hasher.hash(left, right).unwrap();
+
+        let proof = merkle.generate_proof(2); // 78
+
+        assert_eq!(proof.0.len(), 3);
+
+        assert_eq!(proof.0[0].value(), U256::from(78));
+        assert_eq!(proof.0[0].side(), Side::Left);
+
+        assert_eq!(proof.0[1].value(), right);
+        assert_eq!(proof.0[1].side(), Side::Right);
+
+        assert_eq!(proof.0[2].value(), root);
+        assert_eq!(proof.0[2].side(), Side::Left);
+
+        assert_eq!(proof.root(), root);
+        assert_eq!(proof.value(), U256::from(78));
+    }
 }
