@@ -2,7 +2,10 @@ use std::error::Error;
 
 use alloy::primitives::U256;
 
-use crate::hash::Hasher;
+use crate::{
+    hash::Hasher,
+    merkle_tree::{MerkleProof, Side},
+};
 
 pub struct MerkleTree {
     hasher: Hasher,
@@ -60,6 +63,16 @@ impl MerkleTree {
 
     pub fn root(&self) -> U256 {
         *self.tree.last().unwrap().first().unwrap()
+    }
+
+    pub fn generate_proof(&self, index: usize) -> MerkleProof {
+        let mut proof = MerkleProof::new();
+        let mut index = index;
+        for layer in &self.tree {
+            proof.push(layer[index], Side::from(index));
+            index /= 2;
+        }
+        proof
     }
 
     pub fn print_tree(&self) {
