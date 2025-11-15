@@ -1,22 +1,32 @@
 use alloy::primitives::U256;
 
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
-pub struct MerkleProof(pub Vec<MerkleProofStep>);
+pub struct MerkleProof {
+    value: U256,
+    steps: Vec<MerkleProofStep>,
+}
 
 impl MerkleProof {
-    pub fn new() -> Self {
-        MerkleProof(vec![])
+    pub fn new(value: U256) -> Self {
+        MerkleProof {
+            value,
+            steps: vec![],
+        }
     }
 
     pub fn push(&mut self, hashed: U256, side: Side) {
-        self.0.push(MerkleProofStep {
+        self.steps.push(MerkleProofStep {
             side,
             value: hashed,
         });
     }
 
     pub fn value(&self) -> U256 {
-        self.0.first().unwrap().value
+        self.value
+    }
+
+    pub fn steps(&self) -> &[MerkleProofStep] {
+        &self.steps
     }
 }
 
@@ -40,14 +50,4 @@ impl MerkleProofStep {
 pub enum Side {
     Left,
     Right,
-}
-
-impl From<usize> for Side {
-    fn from(value: usize) -> Self {
-        if value % 2 == 0 {
-            Self::Left
-        } else {
-            Self::Right
-        }
-    }
 }

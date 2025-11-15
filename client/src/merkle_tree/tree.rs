@@ -66,11 +66,17 @@ impl MerkleTree {
     }
 
     pub fn generate_proof(&self, index: usize) -> MerkleProof {
-        let mut proof = MerkleProof::new();
+        let value = self.tree.first().unwrap()[index];
+        let mut proof = MerkleProof::new(value);
+
         let mut index = index;
         for i in 0..self.tree.len() - 1 {
             let layer = &self.tree[i];
-            proof.push(layer[index], Side::from(index));
+            if index % 2 == 0 {
+                proof.push(layer[index + 1], Side::Right);
+            } else {
+                proof.push(layer[index - 1], Side::Left);
+            };
             index /= 2;
         }
         proof
@@ -143,17 +149,17 @@ mod tests {
         //      root
         //  left    right
         // 76  77  78    0
-        let right = hasher.hash(U256::from(78), U256::ZERO).unwrap();
+        let left = hasher.hash(U256::from(76), U256::from(77)).unwrap();
 
         let proof = merkle.generate_proof(2); // 78
 
-        assert_eq!(proof.0.len(), 2);
+        assert_eq!(proof.steps().len(), 2);
 
-        assert_eq!(proof.0[0].value(), U256::from(78));
-        assert_eq!(proof.0[0].side(), Side::Left);
+        assert_eq!(proof.steps()[0].value(), U256::from(0));
+        assert_eq!(proof.steps()[0].side(), Side::Right);
 
-        assert_eq!(proof.0[1].value(), right);
-        assert_eq!(proof.0[1].side(), Side::Right);
+        assert_eq!(proof.steps()[1].value(), left);
+        assert_eq!(proof.steps()[1].side(), Side::Left);
 
         assert_eq!(proof.value(), U256::from(78));
     }
