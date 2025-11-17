@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use alloy::primitives::U256;
 
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
@@ -50,4 +52,45 @@ impl MerkleProofStep {
 pub enum Side {
     Left,
     Right,
+}
+
+impl From<Side> for u8 {
+    // in circom circuit VerifyProof we don't have enum and we use numbers to specify side
+    // 0 => Left
+    // 1 => Right
+    fn from(value: Side) -> Self {
+        match value {
+            Side::Left => 0,
+            Side::Right => 1,
+        }
+    }
+}
+
+#[derive(serde::Serialize)]
+pub struct CircomInputJson {
+    steps: Vec<String>,
+    sides: Vec<String>,
+    root: String,
+}
+
+impl CircomInputJson {
+    pub fn new(proof: MerkleProof, root: U256) -> Self {
+        let mut steps = Vec::<String>::new();
+        let mut sides = Vec::<String>::new();
+
+        for step in proof.steps() {
+            steps.push(step.value().to_string());
+            sides.push(u8::from(step.side()).to_string());
+        }
+
+        CircomInputJson {
+            steps,
+            sides,
+            root: root.to_string(),
+        }
+    }
+
+    pub fn to_json(&self) -> Result<String, Box<dyn Error>> {
+        Ok(serde_json::to_string_pretty(self)?)
+    }
 }
