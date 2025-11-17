@@ -2,7 +2,7 @@ use std::fs;
 
 use alloy::primitives::U256;
 
-use crate::merkle_tree::{CircomInputJson, MerkleTree};
+use crate::merkle_tree::{CircomInputJson, MerkleTree, verify};
 
 mod contract;
 mod hash;
@@ -41,7 +41,9 @@ async fn main() {
     // assert_eq!(merkle_tree.root(), contract_root);
     println!("root: {}", merkle_tree.root());
 
-    let proof = merkle_tree.generate_proof(2);
+    let proof = merkle_tree.generate_proof(2); // 78
+    let verified = verify(merkle_tree.root(), proof.clone());
+    assert!(verified);
     println!("proof:\n{:?}", &proof);
 
     let json = CircomInputJson::new(proof, merkle_tree.root())

@@ -70,6 +70,7 @@ impl From<Side> for u8 {
 pub struct CircomInputJson {
     steps: Vec<String>,
     sides: Vec<String>,
+    value: String,
     root: String,
 }
 
@@ -86,6 +87,7 @@ impl CircomInputJson {
         CircomInputJson {
             steps,
             sides,
+            value: proof.value.to_string(),
             root: root.to_string(),
         }
     }

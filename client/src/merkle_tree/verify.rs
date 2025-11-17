@@ -37,6 +37,20 @@ mod tests {
     }
 
     #[test]
+    fn verify_valid_proof_bigger_depth_test() {
+        let mut merkle = MerkleTree::new(5).unwrap();
+
+        merkle.add_leaf(U256::from(76));
+        merkle.add_leaf(U256::from(77));
+
+        merkle.calculate().unwrap();
+        merkle.print_tree();
+        let proof = merkle.generate_proof(1); // 78
+        let verified = verify(merkle.root(), proof);
+        assert!(verified);
+    }
+
+    #[test]
     fn verify_invalid_proof_test() {
         let mut proof = MerkleProof::new(U256::from(256));
 
