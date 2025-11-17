@@ -27,9 +27,14 @@ template Poseidon2SwapInputs(){
 
     signal left;
     signal right;
+    signal leftTemp;
+    signal rightTemp;
 
-    left  <-- (s * b) + ((1 - s) * a);
-    right <-- (s * a) + ((1 - s) * b);
+    leftTemp  <== ((1 - s) * a);
+    rightTemp <== ((1 - s) * b);
+
+    left  <== (s * b) + leftTemp;
+    right <== (s * a) + rightTemp;
 
     component p = Poseidon2();
     p.left <== left;

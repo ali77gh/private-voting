@@ -13,7 +13,7 @@ template VerifyTree(Depth){
     component hashers[Depth];
     signal calculated[Depth + 1];
 
-    calculated[0] <-- steps[0];
+    calculated[0] <== steps[0];
 
     for (var i = 0; i < Depth; i++) {
         hashers[i] = Poseidon2SwapInputs();
