@@ -9,7 +9,7 @@ witness:
 
 trusted_setup:
 	mkdir -p out
-	npx snarkjs powersoftau new bn128 12 ./tmp/pot12_0000.ptau -v
+	npx snarkjs powersoftau new bn128 15 ./tmp/pot12_0000.ptau -v
 	npx snarkjs powersoftau prepare phase2 ./tmp/pot12_0000.ptau ./tmp/pot12_final.ptau -v
 	npx snarkjs groth16 setup ./tmp/main.r1cs ./tmp/pot12_final.ptau ./tmp/main_0000.zkey
 	npx snarkjs zkey export verificationkey ./tmp/main_0000.zkey ./out/verification_key.json
@@ -30,3 +30,7 @@ all:
 	make generate_proof 
 	make verify_proof 
 	make generate_verifier
+
+compile_and_witness:
+	make compile 
+	make witness
