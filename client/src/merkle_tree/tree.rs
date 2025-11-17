@@ -79,7 +79,7 @@ impl MerkleTree {
         *self.tree.last().unwrap().first().unwrap()
     }
 
-    pub fn generate_proof(&self, index: usize) -> MerkleProof {
+    pub fn generate_proof(&mut self, index: usize) -> MerkleProof {
         let value = self.tree.first().unwrap()[index];
         let mut proof = MerkleProof::new(value);
 
@@ -87,7 +87,12 @@ impl MerkleTree {
         for i in 0..self.tree.len() - 1 {
             let layer = &self.tree[i];
             if index % 2 == 0 {
-                proof.push(layer[index + 1], Side::Right);
+                if layer.len() == 1 {
+                    let default = self.defaults(i).unwrap();
+                    proof.push(default, Side::Right);
+                } else {
+                    proof.push(layer[index + 1], Side::Right);
+                }
             } else {
                 proof.push(layer[index - 1], Side::Left);
             };
@@ -98,12 +103,14 @@ impl MerkleTree {
 
     pub fn print_tree(&self) {
         println!("--- tree ---");
-        for layer in &self.tree {
+        for (layer_index, layer) in self.tree.iter().enumerate() {
+            print!("layer: {}, len: {} content: ", layer_index, layer.len());
             for i in layer {
                 print!("{i} ");
             }
             println!();
         }
+        println!("--- end of tree ---");
     }
 }
 
