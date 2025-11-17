@@ -9,13 +9,15 @@ use crate::{
 
 pub struct MerkleTree {
     hasher: Hasher,
+    depth: usize,
     tree: Vec<Vec<U256>>,
     defaults: Vec<U256>,
 }
 
 impl MerkleTree {
-    pub fn new() -> Result<Self, Box<dyn Error>> {
+    pub fn new(depth: usize) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
+            depth,
             hasher: Hasher::new()?,
             tree: vec![vec![]],            // first layer (for leafs)
             defaults: vec![U256::from(0)], // first layer default is always zero
@@ -47,6 +49,18 @@ impl MerkleTree {
             self.tree.push(next_layer?);
             i += 1;
         }
+
+        // calculate rest of nodes to the depth
+        //                          layer[i][0]
+        //                         /   |
+        // last layer single element   default[i - 1]
+        while self.tree.len() < self.depth {
+            let default = self.defaults(i)?;
+            let hash = self.hasher.hash(self.tree[i][0], default)?;
+            self.tree.push(vec![hash]);
+            i += 1;
+        }
+
         Ok(())
     }
 
@@ -99,7 +113,7 @@ mod tests {
 
     #[test]
     fn defaults_test() {
-        let mut merkle = MerkleTree::new().unwrap();
+        let mut merkle = MerkleTree::new(3).unwrap();
         let mut hasher = Hasher::new().unwrap();
 
         let layer1 = hasher.hash(U256::ZERO, U256::ZERO).unwrap();
@@ -114,7 +128,7 @@ mod tests {
 
     #[test]
     fn calculation_test() {
-        let mut merkle = MerkleTree::new().unwrap();
+        let mut merkle = MerkleTree::new(3).unwrap();
         let mut hasher = Hasher::new().unwrap();
 
         merkle.add_leaf(U256::from(76));
@@ -134,9 +148,35 @@ mod tests {
         assert_eq!(merkle.root(), correct_root);
     }
 
+    /// This test makes sure root calculations continues to the depth
+    /// And not stopped when layer.len == 1
+    #[test]
+    fn calculation_to_depth_test() {
+        let mut merkle = MerkleTree::new(3).unwrap();
+        let mut hasher = Hasher::new().unwrap();
+
+        merkle.add_leaf(U256::from(76));
+        merkle.add_leaf(U256::from(77));
+
+        merkle.calculate().unwrap();
+
+        // manual calculation
+        // in this example left is not root and root is root :)
+        // because depth is 3 and not two
+        //      root
+        //  left    right
+        // 76  77  0     0
+        let left = hasher.hash(U256::from(76), U256::from(77)).unwrap();
+        let right = hasher.hash(U256::ZERO, U256::ZERO).unwrap();
+        let correct_root = hasher.hash(left, right).unwrap();
+
+        assert_eq!(merkle.defaults(1).unwrap(), right);
+        assert_eq!(merkle.root(), correct_root);
+    }
+
     #[test]
     fn proof_test() {
-        let mut merkle = MerkleTree::new().unwrap();
+        let mut merkle = MerkleTree::new(3).unwrap();
         let mut hasher = Hasher::new().unwrap();
 
         merkle.add_leaf(U256::from(76));

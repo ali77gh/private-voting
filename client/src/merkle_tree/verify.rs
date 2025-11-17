@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn verify_valid_proof_test() {
-        let mut merkle = MerkleTree::new().unwrap();
+        let mut merkle = MerkleTree::new(3).unwrap();
 
         merkle.add_leaf(U256::from(76));
         merkle.add_leaf(U256::from(77));

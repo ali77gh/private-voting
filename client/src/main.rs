@@ -29,7 +29,7 @@ async fn main() {
     //     println!("- {}", commitment);
     // }
 
-    let mut merkle_tree = MerkleTree::new().unwrap();
+    let mut merkle_tree = MerkleTree::new(32).unwrap();
     // merkle_tree.add_leafs(commitments);
     merkle_tree.add_leaf(U256::from(76));
     merkle_tree.add_leaf(U256::from(77));
